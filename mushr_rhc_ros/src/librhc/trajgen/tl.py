@@ -15,6 +15,9 @@ class TL:
 
         self.reset()
 
+    def use_trajopt(self):
+        return False
+
     def reset(self):
         self.K = self.params.get_int("K", default=62)
         self.T = self.params.get_int("T", default=15)

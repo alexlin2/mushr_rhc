@@ -2,5 +2,6 @@
 # License: BSD 3-Clause. See LICENSE.md file in root directory.
 
 from .waypoints import Waypoints
+from .tracking  import Tracking
 
 __all__ = ["Waypoints"]

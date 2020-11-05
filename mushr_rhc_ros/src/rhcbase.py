@@ -16,11 +16,16 @@ import librhc.value as value
 import librhc.worldrep as worldrep
 import utils
 
+controllers = {"mpc": librhc.MPC, "umpc": librhc.UMPC}
+
 motion_models = {"kinematic": model.Kinematics}
 
-trajgens = {"tl": trajgen.TL, "dispersion": trajgen.Dispersion}
+trajgens = {"tl": trajgen.TL, 
+            "dispersion": trajgen.Dispersion, 
+            "mxpi": trajgen.MXPI,
+            "warmstart": trajgen.Warmstart}
 
-cost_functions = {"waypoints": cost.Waypoints}
+cost_functions = {"waypoints": cost.Waypoints, "tracking": cost.Tracking}
 
 value_functions = {"simpleknn": value.SimpleKNN}
 
@@ -39,11 +44,20 @@ class RHCBase(object):
         self.map_data = None
 
     def load_controller(self):
+        c = self.get_controller()
         m = self.get_model()
         tg = self.get_trajgen(m)
         cf = self.get_cost_fn()
 
-        return librhc.MPC(self.params, self.logger, self.dtype, m, tg, cf)
+        return c(self.params, self.logger, self.dtype, m, tg, cf)
+
+    def get_controller(self):
+        cname = self.params.get_str("controller", default="umpc")
+        print "[controller] setting controller to", cname
+        if cname not in controllers:
+            self.logger.fatal("controller '{}' is not valid".format(cname))
+
+        return controllers[cname]
 
     def get_model(self):
         mname = self.params.get_str("model_name", default="kinematic")
@@ -54,6 +68,7 @@ class RHCBase(object):
 
     def get_trajgen(self, model):
         tgname = self.params.get_str("trajgen_name", default="tl")
+        print "[controller] setting trajgen to", tgname
         if tgname not in trajgens:
             self.logger.fatal("trajgen '{}' is not valid".format(tgname))
 

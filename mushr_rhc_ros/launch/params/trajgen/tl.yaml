@@ -1,5 +1,6 @@
 T: 21
 K: 201
+P: 15
 trajgen_name: 'tl'
 
 horizon:
@@ -19,3 +20,4 @@ cost_fn:
     bounds_cost: 1000.0
 world_rep:
     epsilon: 0.6
+    

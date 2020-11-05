@@ -17,7 +17,13 @@ class Kinematics:
         self.reset()
 
     def reset(self):
-        self.set_k(self.params.get_int("K", default=62))
+        k = self.params.get_int("K", default=62)
+        p = self.params.get_int("P", default=1)
+        controller = self.params.get_str("controller", default="mpc")
+        if controller == 'umpc':
+            self.set_k(k*p)
+        else:
+            self.set_k(k)
 
     def set_k(self, k):
         """

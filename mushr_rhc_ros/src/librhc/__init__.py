@@ -2,5 +2,6 @@
 # License: BSD 3-Clause. See LICENSE.md file in root directory.
 
 from .mpc import MPC
+from .umpc import UMPC
 
-__all__ = ["MPC"]
+__all__ = ["MPC", "UMPC"]

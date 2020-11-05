@@ -80,7 +80,7 @@ class MPC:
         result, idx = self.trajgen.generate_control(trajs, costs)
         return result, self.rollouts[idx]
 
-    def set_goal(self, goal):
+    def set_task(self, goal):
         """
         Args:
         goal [(3,) tensor] -- Goal in "world" coordinates

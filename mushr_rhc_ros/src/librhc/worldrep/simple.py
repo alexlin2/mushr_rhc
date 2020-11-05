@@ -29,11 +29,17 @@ class Simple:
     def reset(self):
         self.T = self.params.get_int("T", default=15)
         self.K = self.params.get_int("K", default=62)
+        self.P = self.params.get_int("P", default=1)
         self.epsilon = self.params.get_float("world_rep/epsilon", default=0.5)
+        controller = self.params.get_str("controller", default="mpc")
+        if controller == 'umpc':
+            self.nR = self.K * self.P # num rollouts
+        else:
+            self.nR = self.K          # num rollouts
 
-        self.scaled = self.dtype(self.K * self.T, 3)
-        self.bbox_map = self.dtype(self.K * self.T, 2, 4)
-        self.perm = rhctensor.byte_tensor()(self.K * self.T)
+        self.scaled = self.dtype(self.nR * self.T, 3)
+        self.bbox_map = self.dtype(self.nR * self.T, 2, 4)
+        self.perm = rhctensor.byte_tensor()(self.nR * self.T)
 
         # Ratio of car to extend in every direction
         self.car_length = self.params.get_float("world_rep/car_length", default=0.5)
@@ -57,7 +63,7 @@ class Simple:
         Returns:
             (K * T, tensor) 1 if collision, 0 otherwise
         """
-        assert poses.size() == (self.K * self.T, 3)
+        assert poses.size() == (self.nR * self.T, 3)
 
         utils.map.world2map(self.map, poses, out=self.scaled)
 
@@ -74,7 +80,7 @@ class Simple:
         return self.perm.type(self.dtype)
 
     def check_collision_in_map(self, poses):
-        assert poses.size() == (self.K * self.T, 3)
+        assert poses.size() == (self.nR * self.T, 3)
 
         utils.map.world2map(self.map, poses, out=self.scaled)
 
