@@ -38,7 +38,7 @@ class Tracking:
 
         self.finish_threshold = self.params.get_float("cost_fn/finish_threshold", 0.5)
         self.exceed_threshold = self.params.get_float("cost_fn/exceed_threshold", 4.0)
-        self.collision_check  = self.params.get_bool("cost_fn/collision_check", True) 
+        self.collision_check  = False #self.params.get_bool("cost_fn/collision_check", True) 
 
         self.lookahead = self.params.get_float("cost_fn/lookahead", 1.0)
 
@@ -48,7 +48,7 @@ class Tracking:
         self.smoothing_discount_rate = self.params.get_float(
             "cost_fn/smoothing_discount_rate", default=0.04
         )
-        self.smooth_w = self.params.get_float("cost_fn/smooth_w", default=3.0)
+        self.smooth_w = self.params.get_float("cost_fn/smooth_w", default=0.3)
         self.bounds_cost = self.params.get_float("cost_fn/bounds_cost", default=100.0)
 
         self.obs_dist_cooloff = torch.arange(1, self.T + 1).mul_(2).type(self.dtype)

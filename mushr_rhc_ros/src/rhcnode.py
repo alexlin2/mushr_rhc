@@ -100,14 +100,10 @@ class RHCNode(rhcbase.RHCBase):
 
         while not rospy.is_shutdown() and self.run:
             ip = self.inferred_pose()      
-            if self.umpc:
-                #state = self.pose_dist()
-                state = ip
-            else:
-                state = ip
+            state = ip
             
             next_traj, rollout = self.run_loop(state, ip)
-            print(next_traj[0])
+            #print(next_traj[0])
 
             with self.traj_pub_lock:
                 if rollout is not None:
