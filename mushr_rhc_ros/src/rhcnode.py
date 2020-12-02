@@ -83,19 +83,6 @@ class RHCNode(rhcbase.RHCBase):
 
         rate = rospy.Rate(50)
         self.logger.info("Initialized")
-
-        paths = XYHVPath()
-        for i in range(1,10):
-            path = XYHV()
-            path.x = float(i)
-            path.y = 0
-            path.h = math.atan2(path.y, path.x)
-            path.v = float(1)
-            paths.waypoints.append(path)
-               
-
-        send_path = rospy.ServiceProxy("~task/path", FollowPath)
-        print(send_path(paths))
         
 
         while not rospy.is_shutdown() and self.run:

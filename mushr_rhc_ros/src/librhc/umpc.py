@@ -24,8 +24,8 @@ class UMPC:
         Args:
         init [bool] -- whether this is being called by the init function
         """
-        self.T = self.params.get_int("T", default=15)
-        self.K = self.params.get_int("K", default=62)
+        self.T = self.params.get_int("T", default=15)  
+        self.K = self.params.get_int("K", default=62) 
         self.P = self.params.get_int("P", default=128)
         self.nR = self.K * self.P # num rollouts
         
