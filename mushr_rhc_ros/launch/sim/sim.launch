@@ -1,5 +1,5 @@
 <launch>
-    <arg name="tg" default="dispersion" />
+    <arg name="tg" default="mxpi" />
 	<arg name="map_server" default="1" />
 	<arg name="car_name" default="car" />
 	<arg name="cost" default="tracking" />
