@@ -26,7 +26,7 @@ class UMPC:
         """
         self.T = self.params.get_int("T", default=15)  
         self.K = self.params.get_int("K", default=62) 
-        self.P = self.params.get_int("P", default=128)
+        self.P = self.params.get_int("P", default=1)
         self.nR = self.K * self.P # num rollouts
         
         # Update number of rollouts required by kinematics model

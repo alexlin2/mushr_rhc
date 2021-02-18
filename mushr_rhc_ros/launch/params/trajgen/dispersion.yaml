@@ -1,6 +1,6 @@
-T: 21
-K: 301
-P: 15
+T: 42
+K: 30
+P: 1
 trajgen_name: 'dispersion'
 horizon:
     distance: 3.5
@@ -14,7 +14,7 @@ trajgen:
 cost_fn:
     obs_dist_w: 86.0
     cost2go_w: 10.0
-    smoothing_discount_rate: 0.0
+    smoothing_discount_rate: 0.1
     bounds_cost: 1000.0
 world_rep:
     epsilon: 0.6

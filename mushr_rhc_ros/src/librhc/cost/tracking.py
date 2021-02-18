@@ -1,5 +1,5 @@
 import torch
-
+from collision_checker import CollisionChecker
 import threading
 
 
@@ -14,6 +14,7 @@ class Tracking:
         self.dtype = dtype
         self.map = map
 
+        self.collision_checker = CollisionChecker()
         self.world_rep = world_rep
         self.value_fn = value_fn
 
@@ -38,7 +39,7 @@ class Tracking:
 
         self.finish_threshold = self.params.get_float("cost_fn/finish_threshold", 0.5)
         self.exceed_threshold = self.params.get_float("cost_fn/exceed_threshold", 4.0)
-        self.collision_check  = False #self.params.get_bool("cost_fn/collision_check", True) 
+        self.collision_check  = True #self.params.get_bool("cost_fn/collision_check", True) 
 
         self.lookahead = self.params.get_float("cost_fn/lookahead", 1.0)
 
@@ -48,7 +49,7 @@ class Tracking:
         self.smoothing_discount_rate = self.params.get_float(
             "cost_fn/smoothing_discount_rate", default=0.04
         )
-        self.smooth_w = self.params.get_float("cost_fn/smooth_w", default=0.3)
+        self.smooth_w = self.params.get_float("cost_fn/smooth_w", default=0.6)
         self.bounds_cost = self.params.get_float("cost_fn/bounds_cost", default=100.0)
 
         self.obs_dist_cooloff = torch.arange(1, self.T + 1).mul_(2).type(self.dtype)
@@ -67,7 +68,8 @@ class Tracking:
             self.path = None
 
         if self.collision_check:
-            self.world_rep.reset()
+            self.collision_checker.run()
+            #self.world_rep.reset()
 
 
     def apply(self, poses, ip):
@@ -103,6 +105,10 @@ class Tracking:
 
         # get all collisions (nR, T, tensor)
         if self.collision_check:
+            collision_cost = self.collision_checker.collision_check(poses)
+            colliding = collision_cost.nonzero()
+            result[colliding] = 10000000
+            '''
             collisions = self.world_rep.check_collision_in_map(all_poses).view(
                 self.nR, self.T
             )
@@ -117,6 +123,7 @@ class Tracking:
             # filter out all colliding trajectories
             colliding = collision_cost.nonzero()
             result[colliding] = 1000000000
+            '''
 
         if self.viz_waypoint:
             from librhc.rosviz import viz_selected_waypoint

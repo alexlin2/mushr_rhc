@@ -213,7 +213,7 @@ class RHCNode(rhcbase.RHCBase):
 
     def srv_path(self, msg):
         path = msg.path.waypoints
-        print path
+
         self.ready_event.wait()
         if "PATH" is not self.rhctrl.cost.get_task_type():
             self.logger.err("This controller does not accept paths as a task type. \

@@ -3,5 +3,6 @@
 
 from .waypoints import Waypoints
 from .tracking  import Tracking
+from .collision_checker import CollisionChecker
 
 __all__ = ["Waypoints"]

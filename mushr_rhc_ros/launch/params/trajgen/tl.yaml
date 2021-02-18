@@ -1,6 +1,6 @@
-T: 21
-K: 201
-P: 15
+T: 45
+K: 32
+P: 1
 trajgen_name: 'tl'
 
 horizon:
@@ -16,7 +16,7 @@ cost_fn:
     dist_w: 0.0
     obs_dist_w: 100.0
     cost2go_w: 1.0
-    smoothing_discount_rate: 1.0
+    smoothing_discount_rate: 0.6
     bounds_cost: 1000.0
 world_rep:
     epsilon: 0.6
