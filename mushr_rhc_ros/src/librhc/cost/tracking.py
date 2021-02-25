@@ -14,7 +14,7 @@ class Tracking:
         self.dtype = dtype
         self.map = map
 
-        self.collision_checker = CollisionChecker()
+        self.collision_checker = CollisionChecker(params)
         self.world_rep = world_rep
         self.value_fn = value_fn
 
@@ -41,7 +41,7 @@ class Tracking:
         self.exceed_threshold = self.params.get_float("cost_fn/exceed_threshold", 4.0)
         self.collision_check  = True #self.params.get_bool("cost_fn/collision_check", True) 
 
-        self.lookahead = self.params.get_float("cost_fn/lookahead", 2.0)
+        self.lookahead = self.params.get_float("cost_fn/lookahead", 1.0)
 
         self.dist_w = self.params.get_float("cost_fn/dist_w", default=1.0)
         self.obs_dist_w = self.params.get_float("cost_fn/obs_dist_w", default=5.0)
