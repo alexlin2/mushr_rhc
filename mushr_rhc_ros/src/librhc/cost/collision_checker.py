@@ -9,8 +9,7 @@ from geometry_msgs.msg import (
 )
 
 class CollisionChecker:
-    def __init__(self, circle_offsets = [-0.1,0.1], circle_radii = 0.5, car_names = ["car2"]):
-        self._circle_offsets = circle_offsets #
+    def __init__(self, circle_radii = 0.5, car_names = ["car2"]):
         self._circle_radii = circle_radii # 1 meter
         self._car_names = car_names
         self._obstacles = {}
@@ -32,25 +31,13 @@ class CollisionChecker:
         n = paths.shape[0]
         collision_check_array = np.zeros(n)
         obstacles = list(self._obstacles.values())
-        print(paths.size())
         for i in range(n):
             collision_free = True
             path = paths[i]
             # Iterate over the points in the path.
             for j in range(len(path)):
-                circle_locations = np.zeros((len(self._circle_offsets), 2))
-                for c in range(len(self._circle_offsets)):
-                    circle_locations[c, 0] = path[j][0] + \
-                        self._circle_offsets[c] * np.cos(path[j][2])
-                    circle_locations[c, 1] = path[j][1] + \
-                        self._circle_offsets[c] * np.sin(path[j][2])
-                # Assumes each obstacle is approximated by a collection of points
-                # of the form [x, y].
-                # Here, we will iterate through the obstacle points, and check if any of
-                # the obstacle points lies within any of our circles.
-                # print ("CIRCLE: ", circle_locations.shape)
                 for k in range(len(obstacles)):
-                    collision_dists = [np.linalg.norm(obstacles[k]-x) for x in circle_locations]
+                    collision_dists = np.linalg.norm(obstacles[k]-np.asarray(path[j][:2])) 
                     collision_dists = np.subtract(
                         collision_dists, self._circle_radii)
                     collision_free = collision_free and not np.any(
