@@ -43,7 +43,7 @@ class MXPI:
         self.sigma[:,:,0] = sigma_v
         self.sigma[:,:,1] = sigma_delta
 
-        self.warmstarted = False
+        self.warmstarted = True
         # The controls for TL are precomputed, and don't change
         self.ctrls = self.dtype(self.K, self.T, self.NCTRL)
         self.ctrls[:, :, 0] = self.desired_speed
