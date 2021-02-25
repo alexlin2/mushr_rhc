@@ -9,9 +9,11 @@ from geometry_msgs.msg import (
 )
 
 class CollisionChecker:
-    def __init__(self, circle_radii = 0.5, car_names = ["car2"]):
+    def __init__(self, params, circle_radii = 0.5, car_names = ["car1","car2"]):
         self._circle_radii = circle_radii # 1 meter
+        self._params = params
         self._car_names = car_names
+        self._this_car = ""
         self._obstacles = {}
 
 
@@ -53,12 +55,13 @@ class CollisionChecker:
         return collision_check_array
 
     def run(self):
-
+        self._this_car = self._params.get_str("car_name", default="car")
         for car in self._car_names:
-            rospy.Subscriber(
-                "/" + car + "/" + "car_pose",
-                PoseStamped,
-                self.generate_obstacles,
-                callback_args=car,
-                queue_size=10,
-            )
+            if car != self._this_car:
+                rospy.Subscriber(
+                    "/" + car + "/" + "car_pose",
+                    PoseStamped,
+                    self.generate_obstacles,
+                    callback_args=car,
+                    queue_size=10,
+                )
