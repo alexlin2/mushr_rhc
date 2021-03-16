@@ -33,9 +33,10 @@ class UMPC:
         self.kinematics.set_k(self.nR)
 
         # Rollouts buffer, the main engine of our computation
-        self.rollouts = self.dtype(self.nR, self.T, self.NPOS)
+        self.rollouts = self.dtype(self.nR * 3, self.T, self.NPOS)
 
-        self.desired_speed = self.params.get_float("trajgen/desired_speed", default=1.0)
+        self.desired_speed = [0.1,0.5, 1.0]
+        #self.desired_speed = self.params.get_float("trajgen/desired_speed", default=1.0)
 
         if not init:
             self.trajgen.reset()
@@ -55,12 +56,13 @@ class UMPC:
         self.state = state
         self.ip = ip
         # For each K trial, the first position is at the current position
-
+        '''
         v = min(
             self.desired_speed,
             self.cost.get_desired_speed(ip, self.desired_speed)
         )
-        trajs = self.trajgen.get_control_trajectories(v)
+        '''
+        trajs = self.trajgen.get_control_trajectories(self.desired_speed)
 
         costs = self._rollout2cost(trajs)
 
@@ -101,15 +103,14 @@ class UMPC:
             idx = torch.randint(low=0, high=self.state.size(0), size=(self.P,))
             idx = idx.repeat_interleave(self.K)
             self.rollouts[:, 0] = self.state[idx]
-
-        assert trajs.size() == (self.K, self.T, 2)
-        trajs_e = trajs.repeat(self.P, 1, 1)
-        assert trajs_e.size() == (self.K * self.P, self.T, 2)
+        assert trajs.size() == (self.K * 3, self.T, 2)
+        #trajs_e = trajs.repeat(self.P, 1, 1)
+        #assert trajs_e.size() == (self.K * self.P, self.T, 2)
         for t in range(1, self.T):
             cur_x = self.rollouts[:, t - 1]
-            self.rollouts[:, t] = self.kinematics.apply(cur_x, trajs_e[:, t - 1])
+            self.rollouts[:, t] = self.kinematics.apply(cur_x, trajs[:, t - 1])
 
     def _rollout2cost(self, trajs):
         self._perform_rollout(trajs)
         costs = self.cost.apply(self.rollouts, self.ip)
-        return costs.resize(self.P, self.K).mean(0)
+        return costs #.resize(self.P, self.K).mean(0)

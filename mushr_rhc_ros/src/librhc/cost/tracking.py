@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from collision_checker import CollisionChecker
 import threading
 
@@ -49,7 +50,7 @@ class Tracking:
         self.smoothing_discount_rate = self.params.get_float(
             "cost_fn/smoothing_discount_rate", default=0.04
         )
-        self.smooth_w = self.params.get_float("cost_fn/smooth_w", default=0.6)
+        self.smooth_w = self.params.get_float("cost_fn/smooth_w", default=0.8)
         self.bounds_cost = self.params.get_float("cost_fn/bounds_cost", default=100.0)
 
         self.obs_dist_cooloff = torch.arange(1, self.T + 1).mul_(2).type(self.dtype)
@@ -83,14 +84,15 @@ class Tracking:
         """
         index, waypoint = self._get_reference_index(ip)
 
-        assert poses.size() == (self.nR, self.T, self.NPOS)
+        assert poses.size() == (self.nR*3, self.T, self.NPOS)
         assert self.path.size()[1] == 4
 
-        all_poses = poses.view(self.nR * self.T, self.NPOS)
+        all_poses = poses.view(self.nR *3* self.T, self.NPOS)
 
         # use terminal distance (nR, tensor)
         # TODO: should we look for CTE for terminal distance?
-        errorcost = poses[:, self.T - 1, :2].sub(waypoint[:2]).norm(dim=1).mul(self.error_w)
+        errorcost = torch.tensor([torch.min(poses[i, :, :2].sub(waypoint[:2]).norm(dim=1).mul(self.error_w)) for i in range(self.K*3)])
+        #print(errorcost)
 
         # reward smoothness by taking the integral over the rate of change in poses,
         # with time-based discounting factor
@@ -103,11 +105,20 @@ class Tracking:
 
         result = errorcost.add(smoothness)
 
+        # reward faster trajectories over slower ones
+        #speed_cost = -2 * (poses[:, 0,:2].sub(poses[:,1,:2]).norm(dim=1))
+        #print(speed_cost)
+        #result = result.add(speed_cost)
+        
         # get all collisions (nR, T, tensor)
         if self.collision_check:
             collision_cost = self.collision_checker.collision_check(poses)
-            colliding = collision_cost.nonzero()
-            result[colliding] = 10000000
+            colliding = np.asarray(np.nonzero(collision_cost))
+            far= colliding[np.where(colliding>self.K)]
+            close = colliding[np.where(colliding<=self.K)]
+            result[close] += 10.0
+            result[far] += 100.0
+            
             '''
             collisions = self.world_rep.check_collision_in_map(all_poses).view(
                 self.nR, self.T
@@ -124,7 +135,7 @@ class Tracking:
             colliding = collision_cost.nonzero()
             result[colliding] = 1000000000
             '''
-
+        #print(result)
         if self.viz_waypoint:
             from librhc.rosviz import viz_selected_waypoint
             viz_selected_waypoint(waypoint[:3].clone())

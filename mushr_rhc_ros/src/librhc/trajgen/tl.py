@@ -30,18 +30,21 @@ class TL:
         deltas = torch.arange(min_delta, max_delta + step_size, step_size)
 
         # The controls for TL are precomputed, and don't change
-        self.ctrls = self.dtype(self.K, self.T, self.NCTRL)
+        self.ctrls = self.dtype(self.K*3, self.T, self.NCTRL)
         self.ctrls[:, :, 0] = desired_speed
         for t in range(self.T):
-            self.ctrls[:, t, 1] = deltas
+            for i in range(3):
+                self.ctrls[i * self.K: self.K * (i + 1), t, 1] = deltas
 
-    def get_control_trajectories(self, velocity):
+    def get_control_trajectories(self, velocities):
         """
         Returns:
         [(K, T, NCTRL) tensor] -- of controls
             ([:, :, 0] is the desired speed, [:, :, 1] is the control delta)
         """
-        self.ctrls[:, :, 0] = velocity
+        for i, velocity in enumerate(velocities):
+            self.ctrls[i * self.K: self.K * (i + 1), :, 0] = velocity
+        #print(self.ctrls[:,0,0])
         return self.ctrls
 
     def generate_control(self, controls, costs):
@@ -53,7 +56,7 @@ class TL:
         Returns:
         [(T, NCTRL) tensor] -- The lowest cost trajectory to take
         """
-        assert controls.size() == (self.K, self.T, 2)
-        assert costs.size() == (self.K,)
+        assert controls.size() == (self.K * 3, self.T, 2)
+        assert costs.size() == (self.K *3,)
         _, idx = torch.min(costs, 0)
         return controls[idx], idx
