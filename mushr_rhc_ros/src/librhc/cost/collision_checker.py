@@ -9,7 +9,7 @@ from geometry_msgs.msg import (
 )
 
 class CollisionChecker:
-    def __init__(self, params, circle_radii = 0.5, car_names = ["car1","car2"]):
+    def __init__(self, params, circle_radii = 0.5, car_names = ["car30","car38"]):
         self._circle_radii = circle_radii # 1 meter
         self._params = params
         self._car_names = car_names
