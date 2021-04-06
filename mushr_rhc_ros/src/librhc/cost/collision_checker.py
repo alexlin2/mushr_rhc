@@ -1,4 +1,4 @@
-import numpy as np
+import torch 
 import rospy
 from geometry_msgs.msg import (
     Pose,
@@ -31,8 +31,16 @@ class CollisionChecker:
     #        obstacles - a list of obstacles, each obstacle represented by a list of occupied points of the form [[x1, y1], [x2, y2], ...].
     def collision_check(self, paths):
         n = paths.shape[0]
-        collision_check_array = np.zeros(n)
+        collision_check_array = torch.zeros(n)
         obstacles = list(self._obstacles.values())
+        for obs in obstacles:
+            collision = torch.zeros(n)
+            d = paths[:,:,:2]-torch.tensor(obs)
+            collision_dists = torch.norm(d,dim = 2)
+            collision[torch.any(collision_dists-self._circle_radii<0, dim=1)] = 1
+            collision_check_array += collision
+        return collision_check_array
+        '''
         for i in range(n):
             collision_free = True
             path = paths[i]
@@ -52,6 +60,7 @@ class CollisionChecker:
                 collision_check_array[i] = 0
             else:
                 collision_check_array[i] = 1
+        '''
         return collision_check_array
 
     def run(self):

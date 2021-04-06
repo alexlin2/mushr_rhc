@@ -113,9 +113,9 @@ class Tracking:
         # get all collisions (nR, T, tensor)
         if self.collision_check:
             collision_cost = self.collision_checker.collision_check(poses)
-            colliding = np.asarray(np.nonzero(collision_cost))
-            far= colliding[np.where(colliding>self.K)]
-            close = colliding[np.where(colliding<=self.K)]
+            colliding = torch.nonzero(collision_cost)
+            far= colliding[torch.where(colliding>self.K)]
+            close = colliding[torch.where(colliding<=self.K)]
             result[close] += 10.0
             result[far] += 100.0
             
