@@ -114,8 +114,8 @@ class Tracking:
         if self.collision_check:
             collision_cost = self.collision_checker.collision_check(poses)
             colliding = torch.nonzero(collision_cost)
-            far= colliding[torch.where(colliding>self.K)]
-            close = colliding[torch.where(colliding<=self.K)]
+            far= colliding[torch.nonzero(colliding>self.K)]
+            close = colliding[torch.nonzero(colliding<=self.K)]
             result[close] += 10.0
             result[far] += 100.0
             
