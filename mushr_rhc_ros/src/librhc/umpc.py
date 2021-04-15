@@ -35,7 +35,7 @@ class UMPC:
         # Rollouts buffer, the main engine of our computation
         self.rollouts = self.dtype(self.nR * 3, self.T, self.NPOS)
 
-        self.desired_speed = [0.1,0.5, 1.0]
+        self.desired_speed = [0.2,0.6,0.8]
         #self.desired_speed = self.params.get_float("trajgen/desired_speed", default=1.0)
 
         if not init:
