@@ -30,12 +30,14 @@ class UMPC:
         self.nR = self.K * self.P # num rollouts
         
         # Update number of rollouts required by kinematics model
-        self.kinematics.set_k(self.nR)
+        self.kinematics.set_k(self.nR * 2)
 
         # Rollouts buffer, the main engine of our computation
-        self.rollouts = self.dtype(self.nR * 3, self.T, self.NPOS)
+        self.rollouts = self.dtype(self.nR * 2, self.T, self.NPOS)
 
-        self.desired_speed = [0.2,0.6,0.8]
+        self.desired_speed = [0.4,1.0]
+        self.reference_speed = None
+        self.waypoints = None
         #self.desired_speed = self.params.get_float("trajgen/desired_speed", default=1.0)
 
         if not init:
@@ -56,12 +58,10 @@ class UMPC:
         self.state = state
         self.ip = ip
         # For each K trial, the first position is at the current position
-        '''
-        v = min(
-            self.desired_speed,
-            self.cost.get_desired_speed(ip, self.desired_speed)
-        )
-        '''
+        
+        reference_state_index = torch.argmin(self.waypoints[:].subtract(self.ip[:2]).norm(dim=1))
+        self.desired_speed[1] = self.waypoints[reference_state_index]
+
         trajs = self.trajgen.get_control_trajectories(self.desired_speed)
 
         costs = self._rollout2cost(trajs)
@@ -85,8 +85,11 @@ class UMPC:
 
         return result, self.rollouts[idx]
 
-    def set_task(self, task):
-        return self.cost.set_task(task)
+    def set_task(self, pathmsg):
+        self.waypoints = self.dtype([[pathmsg[i].x, pathmsg[i].y] for i in range(len(pathmsg))])
+        self.reference_speed = self.dtype([pathmsg[i].v for i in range(len(pathmsg))])
+
+        return self.cost.set_task(pathmsg)
 
     def task_complete(self, state):
         """
@@ -103,7 +106,7 @@ class UMPC:
             idx = torch.randint(low=0, high=self.state.size(0), size=(self.P,))
             idx = idx.repeat_interleave(self.K)
             self.rollouts[:, 0] = self.state[idx]
-        assert trajs.size() == (self.K * 3, self.T, 2)
+        assert trajs.size() == (self.K * 2, self.T, 2)
         #trajs_e = trajs.repeat(self.P, 1, 1)
         #assert trajs_e.size() == (self.K * self.P, self.T, 2)
         for t in range(1, self.T):

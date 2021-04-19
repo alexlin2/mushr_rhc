@@ -84,14 +84,14 @@ class Tracking:
         """
         index, waypoint = self._get_reference_index(ip)
 
-        assert poses.size() == (self.nR*3, self.T, self.NPOS)
+        assert poses.size() == (self.nR*2, self.T, self.NPOS)
         assert self.path.size()[1] == 4
 
-        all_poses = poses.view(self.nR *3* self.T, self.NPOS)
+        all_poses = poses.view(self.nR *2* self.T, self.NPOS)
 
         # use terminal distance (nR, tensor)
         # TODO: should we look for CTE for terminal distance?
-        errorcost = torch.tensor([torch.min(poses[i, :, :2].sub(waypoint[:2]).norm(dim=1).mul(self.error_w)) for i in range(self.K*3)])
+        errorcost = torch.tensor([torch.min(poses[i, :, :2].sub(waypoint[:2]).norm(dim=1).mul(self.error_w)) for i in range(self.K*2)])
         #print(errorcost)
 
         # reward smoothness by taking the integral over the rate of change in poses,

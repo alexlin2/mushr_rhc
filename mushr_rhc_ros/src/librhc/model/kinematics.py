@@ -39,12 +39,12 @@ class Kinematics:
         T = self.params.get_int("T", default=15)
         self.dt = time_horizon / T
 
-        self.sin2beta = self.dtype(self.K*3)
-        self.deltaTheta = self.dtype(self.K*3)
-        self.deltaX = self.dtype(self.K*3)
-        self.deltaY = self.dtype(self.K*3)
-        self.sin = self.dtype(self.K*3)
-        self.cos = self.dtype(self.K*3)
+        self.sin2beta = self.dtype(self.K)
+        self.deltaTheta = self.dtype(self.K)
+        self.deltaX = self.dtype(self.K)
+        self.deltaY = self.dtype(self.K)
+        self.sin = self.dtype(self.K)
+        self.cos = self.dtype(self.K)
 
     def apply(self, pose, ctrl):
         """
@@ -54,8 +54,8 @@ class Kinematics:
         Return:
         [(K, NCTRL) tensor] The next position given the current control
         """
-        assert pose.size() == (self.K*3, self.NPOS)
-        assert ctrl.size() == (self.K*3, self.NCTRL)
+        assert pose.size() == (self.K, self.NPOS)
+        assert ctrl.size() == (self.K, self.NCTRL)
 
         self.sin2beta.copy_(ctrl[:, 1]).tan_().mul_(0.5).atan_().mul_(2.0).sin_().add_(
             self.EPSILON
@@ -76,7 +76,7 @@ class Kinematics:
             self.cos
         ).mul_(self.wheel_base).div_(self.sin2beta)
 
-        nextpos = self.dtype(self.K*3, 3)
+        nextpos = self.dtype(self.K, 3)
         nextpos.copy_(pose)
         nextpos[:, 0].add_(self.deltaX)
         nextpos[:, 1].add_(self.deltaY)

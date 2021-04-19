@@ -30,7 +30,7 @@ class TL:
         deltas = torch.arange(min_delta, max_delta + step_size, step_size)
 
         # The controls for TL are precomputed, and don't change
-        self.ctrls = self.dtype(self.K*3, self.T, self.NCTRL)
+        self.ctrls = self.dtype(self.K*2, self.T, self.NCTRL)
         self.ctrls[:, :, 0] = desired_speed
         for t in range(self.T):
             for i in range(3):
@@ -56,7 +56,7 @@ class TL:
         Returns:
         [(T, NCTRL) tensor] -- The lowest cost trajectory to take
         """
-        assert controls.size() == (self.K * 3, self.T, 2)
-        assert costs.size() == (self.K *3,)
+        assert controls.size() == (self.K * 2, self.T, 2)
+        assert costs.size() == (self.K * 2,)
         _, idx = torch.min(costs, 0)
         return controls[idx], idx
