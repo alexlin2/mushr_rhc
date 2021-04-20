@@ -35,7 +35,7 @@ class UMPC:
         # Rollouts buffer, the main engine of our computation
         self.rollouts = self.dtype(self.nR * 2, self.T, self.NPOS)
 
-        self.desired_speed = [0.4,1.0]
+        self.desired_speed = [0.1,1.0]
         self.reference_speed = None
         self.waypoints = None
         #self.desired_speed = self.params.get_float("trajgen/desired_speed", default=1.0)
@@ -59,8 +59,8 @@ class UMPC:
         self.ip = ip
         # For each K trial, the first position is at the current position
         
-        reference_state_index = torch.argmin(self.waypoints[:].subtract(self.ip[:2]).norm(dim=1))
-        self.desired_speed[1] = self.waypoints[reference_state_index]
+        reference_state_index = torch.argmin(self.waypoints[:].sub(self.ip[:2]).norm(dim=1))
+        self.desired_speed[1] = self.reference_speed[reference_state_index]
 
         trajs = self.trajgen.get_control_trajectories(self.desired_speed)
 

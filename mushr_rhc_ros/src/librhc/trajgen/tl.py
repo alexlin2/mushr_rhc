@@ -33,7 +33,7 @@ class TL:
         self.ctrls = self.dtype(self.K*2, self.T, self.NCTRL)
         self.ctrls[:, :, 0] = desired_speed
         for t in range(self.T):
-            for i in range(3):
+            for i in range(2):
                 self.ctrls[i * self.K: self.K * (i + 1), t, 1] = deltas
 
     def get_control_trajectories(self, velocities):
