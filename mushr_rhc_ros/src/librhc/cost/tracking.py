@@ -40,7 +40,7 @@ class Tracking:
 
         self.finish_threshold = self.params.get_float("cost_fn/finish_threshold", 0.1)
         self.exceed_threshold = self.params.get_float("cost_fn/exceed_threshold", 4.0)
-        self.collision_check  = True #self.params.get_bool("cost_fn/collision_check", True) 
+        self.collision_check  = False #self.params.get_bool("cost_fn/collision_check", True) 
 
         self.lookahead = self.params.get_float("cost_fn/lookahead", 1.0)
 

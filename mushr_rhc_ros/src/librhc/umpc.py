@@ -35,7 +35,7 @@ class UMPC:
         # Rollouts buffer, the main engine of our computation
         self.rollouts = self.dtype(self.nR * 2, self.T, self.NPOS)
 
-        self.desired_speed = [0.1,1.0]
+        self.desired_speed = [0.0,0.0]
         self.reference_speed = None
         self.waypoints = None
         #self.desired_speed = self.params.get_float("trajgen/desired_speed", default=1.0)
@@ -61,6 +61,7 @@ class UMPC:
         
         reference_state_index = torch.argmin(self.waypoints[:].sub(self.ip[:2]).norm(dim=1))
         self.desired_speed[1] = self.reference_speed[reference_state_index]
+        self.desired_speed[0] = self.reference_speed[reference_state_index]
 
         trajs = self.trajgen.get_control_trajectories(self.desired_speed)
 
