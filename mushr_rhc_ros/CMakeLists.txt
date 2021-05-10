@@ -51,21 +51,15 @@ catkin_python_setup()
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-#  MPPIPath.msg
-#  Particle.msg
-#  ParticleArray.msg
-#  TLCosts.msg
-XYHVPath.msg 
-XYHV.msg
+  XYHV.msg
+  XYHVPath.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-#  GetPlan.srv
   FollowPath.srv
 )
-
 ## Generate actions in the 'action' folder
 # add_action_files(
 #   FILES
