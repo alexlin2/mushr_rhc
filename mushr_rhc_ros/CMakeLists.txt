@@ -49,20 +49,17 @@ catkin_python_setup()
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-#add_message_files(
-#  FILES
-#  MPPIPath.msg
-#  Particle.msg
-#  ParticleArray.msg
-#  TLCosts.msg
-#)
+add_message_files(
+  FILES
+  XYHV.msg
+  XYHVPath.msg
+)
 
 ## Generate services in the 'srv' folder
-#add_service_files(
-#  FILES
-#  GetPlan.srv
-#)
-
+add_service_files(
+  FILES
+  FollowPath.srv
+)
 ## Generate actions in the 'action' folder
 # add_action_files(
 #   FILES
@@ -71,12 +68,12 @@ catkin_python_setup()
 # )
 
 ## Generate added messages and services with any dependencies listed here
-#generate_messages(
-#  DEPENDENCIES
-#  std_msgs
-#  geometry_msgs
-#  visualization_msgs
-#)
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+  visualization_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
