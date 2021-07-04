@@ -13,18 +13,17 @@ _traj_pub = rospy.Publisher(
 )
 
 
-def viz_trajs_cmap(poses, costs, ns="trajs", cmap="plasma", scale=0.03):
+def viz_trajs_cmap(poses, costs, ns="trajs", cmap="gray", scale=0.03):
     max_c = torch.max(costs)
     min_c = torch.min(costs)
 
     norm = colors.Normalize(vmin=min_c, vmax=max_c)
-
+    # if cmap not in cm.cmaps_listed.keys():
+    #     cmap = "viridis"
     cmap = cm.get_cmap(name=cmap)
 
     def colorfn(cost):
         r, g, b, a = 0.0, 0.0, 0.0, 1.0
-        if cost == min_c:
-            return r, g, b, a
         col = cmap(norm(cost))
         r, g, b = col[0], col[1], col[2]
         if len(col) > 3:
@@ -40,7 +39,7 @@ def viz_trajs(poses, costs, colorfn, ns="trajs", scale=0.03):
         costs should have the same dimensionality as poses.size()[0]
         colorfn maps a point to an rgb tuple of colors
     """
-    assert poses.size()[0] == costs.size()[0]
+    assert poses.shape[0] == costs.shape[0]
 
     markers = MarkerArray()
 
@@ -48,16 +47,10 @@ def viz_trajs(poses, costs, colorfn, ns="trajs", scale=0.03):
         m = Marker()
         m.header.frame_id = "map"
         m.header.stamp = rospy.Time.now()
-        m.ns = ns
+        m.ns = ns + str(i)
         m.id = i
         m.type = m.LINE_STRIP
         m.action = m.ADD
-        m.pose.position.x = 0
-        m.pose.position.y = 0
-        m.pose.position.z = 0
-        m.pose.orientation.x = 0.0
-        m.pose.orientation.y = 0.0
-        m.pose.orientation.z = 0.0
         m.pose.orientation.w = 1.0
         m.scale.x = scale
         m.color.r, m.color.g, m.color.b, m.color.a = colorfn(cost)
@@ -67,16 +60,6 @@ def viz_trajs(poses, costs, colorfn, ns="trajs", scale=0.03):
             p.x, p.y = t[0], t[1]
             m.points.append(p)
 
-        markers.markers.append(m)
-
-    for i in range(len(poses), rospy.get_param("~K"), 1):
-        m = Marker()
-        m.header.frame_id = "map"
-        m.header.stamp = rospy.Time.now()
-        m.ns = ns
-        m.id = i
-        m.type = m.LINE_STRIP
-        m.action = m.DELETE
         markers.markers.append(m)
 
     _traj_pub.publish(markers)

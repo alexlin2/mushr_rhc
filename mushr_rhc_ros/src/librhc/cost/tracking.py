@@ -21,7 +21,7 @@ class Tracking:
 
         self.viz_waypoint = self.params.get_bool("debug/viz_waypoint", True)
         self.do_log_cte = self.params.get_bool("debug/log_cte", True)
-        self.viz_rollouts = self.params.get_bool("debug/flag/viz_rollouts", False)
+        self.viz_rollouts = True#self.params.get_bool("debug/flag/viz_rollouts", False)
         self.n_viz = self.params.get_int("debug/viz_rollouts/n", -1)
         self.print_stats = self.params.get_bool("debug/viz_rollouts/print_stats", False)
 
@@ -152,33 +152,35 @@ class Tracking:
 
             if non_colliding.size()[0] > 0:
 
-                def print_n(c, poses, ns, cmap="coolwarm"):
-                    _, all_idx = torch.sort(c)
+                # def print_n(c, poses, ns, cmap="coolwarm"):
+                #     _, all_idx = torch.sort(c)
 
-                    n = min(self.n_viz, len(c))
-                    idx = all_idx[:n] if n > -1 else all_idx
-                    rosviz.viz_trajs_cmap(poses[idx], c[idx], ns=ns, cmap=cmap)
+                #     n = min(self.n_viz, len(c))
+                #     idx = all_idx[:n] if n > -1 else all_idx
+                
+                _, idx = torch.sort(result)
+                rosviz.viz_trajs_cmap(poses[idx], result[idx], ns="result")
 
-                p_non_colliding = poses[non_colliding].squeeze()
-                print_n(
-                    result[non_colliding].squeeze(), p_non_colliding, ns="final_result"
-                )
-                print_n(errorcost[non_colliding].squeeze(), p_non_colliding, ns="error")
-                print_n(
-                    collision_cost[non_colliding].squeeze(),
-                    p_non_colliding,
-                    ns="collision_cost",
-                )
-                print_n(
-                    obs_dist_cost[non_colliding].squeeze(),
-                    p_non_colliding,
-                    ns="obstacle_dist_cost",
-                )
-                print_n(
-                    smoothness[non_colliding].squeeze(),
-                    p_non_colliding,
-                    ns="smoothness",
-                )
+                #p_non_colliding = poses[non_colliding].squeeze()
+                # print_n(
+                #     result[non_colliding].squeeze(), p_non_colliding, ns="final_result"
+                # )
+                # print_n(errorcost[non_colliding].squeeze(), p_non_colliding, ns="error")
+                # print_n(
+                #     collision_cost[non_colliding].squeeze(),
+                #     p_non_colliding,
+                #     ns="collision_cost",
+                # )
+                # # print_n(
+                # #     obs_dist_cost[non_colliding].squeeze(),
+                # #     p_non_colliding,
+                # #     ns="obstacle_dist_cost",
+                # # )
+                # print_n(
+                #     smoothness[non_colliding].squeeze(),
+                #     p_non_colliding,
+                #     ns="smoothness",
+                # )
 
                 if self.print_stats:
                     _, all_sorted_idx = torch.sort(result[non_colliding].squeeze())
