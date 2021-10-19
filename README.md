@@ -59,7 +59,6 @@ Topic | Type | Description
 
 | Type | Description
 |------|------------
-
-`/mushr_rhc_ros/msg/XYHV`|path defined by X: float64, Y: float64, H(heading): float64, V(speed): float64
-`/mushr_rhc_ros/msg/XYHVPath`|array of XYHV
+`/mushr_rhc_ros/msg/XYHV`|[path defined by X: float64, Y: float64, H(heading): float64, V(speed): float64]
+`/mushr_rhc_ros/msg/XYHVPath`|[array of XYHV]
 
