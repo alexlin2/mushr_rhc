@@ -2,10 +2,7 @@
 
 # Receding Horizon Control
 
-This module hosts the RHC controller first implemented on MuSHR stack. It is a model predictive contoller that plans to waypoints from a goal (instead of a reference trajectory). This controller is suitable for cars that don't have a planning module, but want simple MPC.
-
-## Tutorial
-The following [tutorial](https://mushr.io/tutorials/navigation/) goes through installing/running the car.
+This module hosts the RHC controller that is modified from the official mushr stack. It is a model predictive contoller that trackes a reference trajectory, it also generates trajectories based on different velocities. It can be used in a multi-agent setting to do collision avoidance and yielding behavior. 
 
 ## Installing on the car
 **Note:** if you are using the mushr image you can just clone the repo into `~/catkin_ws/src` and it should work out of the box
@@ -51,12 +48,18 @@ Topic | Type | Description
 Topic | Type | Description
 ------|------|------------
 `/map_metadata`|[nav_msgs/MapMetaData](http://docs.ros.org/api/nav_msgs/html/msg/MapMetaData.html)|Uses dimension and resolution to create occupancy grid.
-`/move_base_simple/goal`|[geometry_msgs/PoseStamped](http://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html)|Goal to compute path to.
 `/car/car_pose`|[geometry_msgs/PoseStamped](http://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html)|*When using simulated car pose* Current pose of the car.
-`/car/pf/inferred_pose`|[geometry_msgs/PoseStamped](http://docs.ros.org/api/geometry_msgs/html/msg/PoseStamped.html)|*When using particle filter for localization* Current pose of the car.
 
 #### Services
 Topic | Type | Description
 ------|------|------------
-`/rhcontroller/reset/hard`|[std_srvs/Empty](http://docs.ros.org/api/std_srvs/html/srv/Empty.html)|Creates a new instance of the MPC object, redoing all initialization computation.
-`/rhcontroller/reset/soft`|[std_srvs/Empty](http://docs.ros.org/api/std_srvs/html/srv/Empty.html)|Resets parameters only, not redoing initialization.
+`/rhcontroller/task/path`|[mushr_rhc_ros/XYHVPath] Path defined by x, y coordinates, heading and velocity. Trajectory to follow.
+
+#### Messages
+
+| Type | Description
+|------|------------
+
+`/mushr_rhc_ros/msg/XYHV`|path defined by X: float64, Y: float64, H(heading): float64, V(speed): float64
+`/mushr_rhc_ros/msg/XYHVPath`|array of XYHV
+
